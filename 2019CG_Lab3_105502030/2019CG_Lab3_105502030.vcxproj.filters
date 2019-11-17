@@ -21,9 +21,15 @@
     <ClCompile Include="Painter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Matrix4by4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Painter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix4by4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
