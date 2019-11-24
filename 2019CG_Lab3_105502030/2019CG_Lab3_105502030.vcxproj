@@ -118,8 +118,12 @@
     <ClCompile Include="Lab3_105502030.cpp" />
     <ClCompile Include="Matrix4by4.cpp" />
     <ClCompile Include="Painter.cpp" />
+    <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Plane.h" />
+    <ClInclude Include="Vertex.h" />
     <ClInclude Include="Matrix4by4.h" />
     <ClInclude Include="Painter.h" />
   </ItemGroup>

@@ -1,10 +1,15 @@
 // Lab2_105502030.cpp : This file contains the 'main' function. Program execution begins and ends there.
-#include "Painter.h"
 #include "Matrix4by4.h"
+#include "Painter.h"
+#include "Vertex.h"
+#include "Plane.h"
 #include <glut.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
+#include <vector>
+#include <tuple>
 #include <math.h>
 
 using namespace std;
@@ -19,12 +24,20 @@ void startDrawing();
 void scaleCommand(float sx, float sy, float sz);
 void rotateCommand(int rotate_axis, int degree);
 void translateCommand(float tx, float ty, float tz);
+void observerCommand(float eyeLocX, float eyeLocY, float eyeLocZ, 
+	float CoIX, float CoIY, float CoIZ, float tilt, 
+	float H, float y, float theta);
+
+void objectCommand();
 
 
 int WINDOW_WIDTH;
 int WINDOW_HEIGHT;
 string inputFileName;
+string obj_ascFileName;
 Matrix4by4 TM;
+vector<Vertex> vertices_vec;
+vector<Plane> object_vec;
 
 void readInputFile()
 {
@@ -32,7 +45,6 @@ void readInputFile()
 	inputFile.open(inputFileName, ios::in);
 
 	string line;
-	stringstream ss;
 
 	cout << "inputFileName is: " << inputFileName << endl;
 
@@ -95,16 +107,19 @@ void readInputCommand(string command)
 			TM.printMatrix();
 		}
 		else if (command_type == "nobackfaces") {
-
+			// No back faces
 		}
 		else if (command_type == "object") {
-
+			// read object.asc file
+			ss >> obj_ascFileName;
+			cout << "\nobject file name is: " << obj_ascFileName << endl;
+			objectCommand();
 		}
 		else if (command_type == "observer") {
 			float Ex, Ey, Ez, COIx, COIy, COIz, Tilt, H, y, tan;
-			ss >> Ex>> Ey>> Ez>> COIx>> COIy>> COIz>> Tilt>> H>> y>> tan;
-			//cout << "tilt is: " << Tilt << endl;
-			//cout << "H is: " << H << endl;
+			ss >> Ex >> Ey >> Ez >> COIx >> COIy >> COIz >> Tilt >> H >> y >> tan;
+			observerCommand(Ex, Ey, Ez, COIx, COIy, COIz, Tilt, H, y, tan);
+			
 		}
 		else if (command_type == "viewport") {
 
@@ -172,6 +187,107 @@ void translateCommand(float tx, float ty, float tz)
 
 	cout << "translating matrix is: \n";
 	translateMatrix.printMatrix();
+
+	return;
+}
+
+void observerCommand(float eyeLocX, float eyeLocY, float eyeLocZ, float CoIX, float CoIY, float CoIZ, float tilt, float H, float y, float theta)
+{
+	// VectorZ is Vector3
+	tuple<float, float, float> VectorZ ( CoIX - eyeLocX, CoIY - eyeLocY, CoIZ - eyeLocZ );
+
+	// assume top point is ( 0, 1, 0 ), therefore, VectorT(top vector) is: Top Point - EyeLocation
+	tuple<float, float, float> VectorT ( 0 - eyeLocX, 1 - eyeLocY, 1 - eyeLocZ );
+
+	// Vector1 = VectorT x VectorZ 
+	tuple<float, float, float> Vector1 ( 
+		get<1>(VectorT)*get<2>(VectorZ) - get<2>(VectorT)*get<1>(VectorZ),
+		get<2>(VectorT)*get<0>(VectorZ) - get<0>(VectorT)*get<2>(VectorZ), 
+		get<0>(VectorT)*get<1>(VectorZ) - get<1>(VectorT)*get<0>(VectorZ)
+	);
+
+	// Vector2 = Vector3 (VectorZ) x Vector1
+	tuple<float, float, float> Vector2(
+		get<1>(VectorZ)*get<2>(Vector1) - get<2>(VectorZ)*get<1>(Vector1),
+		get<2>(VectorZ)*get<0>(Vector1) - get<0>(VectorZ)*get<2>(Vector1),
+		get<0>(VectorZ)*get<1>(Vector1) - get<1>(VectorZ)*get<0>(Vector1)
+	);
+	Matrix4by4 eyeMatrix;
+
+	Matrix4by4 eyeTranslateMatrix;
+	eyeTranslateMatrix.loadTranslationMatrix(-eyeLocX, -eyeLocY, -eyeLocZ);
+
+	Matrix4by4 GRMatrix;
+	GRMatrix.loadGRMatrix(Vector1, Vector2, VectorZ);
+
+	Matrix4by4 MirrorMatrix;
+	MirrorMatrix.loadMirrorMatrix();
+
+	eyeMatrix.leftMultiplyBy(eyeTranslateMatrix);
+	eyeMatrix.leftMultiplyBy(GRMatrix);
+	eyeMatrix.leftMultiplyBy(MirrorMatrix);
+
+	eyeMatrix.printMatrix();
+
+	return;
+
+}
+
+void objectCommand()
+{
+
+	// clear data before reading object .asc file 
+	vertices_vec.clear();
+	object_vec.clear();
+
+	fstream objectFile;
+	objectFile.open(obj_ascFileName, ios::in);
+
+	int vertex_num, plane_num;
+	string line;
+	stringstream ss;
+
+	getline(objectFile, line);		// read the first line of the input file
+	ss << line;
+	ss >> vertex_num >> plane_num;
+
+	cout << "vertex_num: " << vertex_num << endl;
+	cout << "plane_num: " << plane_num << endl;
+
+	ss.clear();
+
+	// 1. read all the vertices
+	float x, y, z;
+
+	for (int i = 0; i < vertex_num; i++) {
+		getline(objectFile, line);
+		ss << line;
+		ss >> x >> y >> z;
+		Vertex tmp;
+		tmp.setCoordinates(x, y, z);
+		vertices_vec.push_back(tmp);
+
+		cout << "i: " << i << "  " << setw(2) << x << setw(2) << " " << y << setw(2) << " " << z << endl;
+	}
+
+	// 2. read all the planes
+	int num_SidesOfPolygon, index;
+	for (int i = 0; i < plane_num; i++) {
+		getline(objectFile, line);
+		ss << line;
+		ss >> num_SidesOfPolygon;
+		Plane tmp_polygon;
+		for (int j = 0; j < num_SidesOfPolygon; j++) {
+			ss >> index;
+			tmp_polygon.getVerticesOfPlane().push_back(vertices_vec[index-1]);
+		}
+		object_vec.push_back(tmp_polygon);
+	}
+
+	// print for tesing
+	cout << "vertices_vec size: " << vertices_vec.size() << endl;
+	cout << "object_vec size: " << object_vec.size() << endl;
+
 
 	return;
 }

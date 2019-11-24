@@ -2,6 +2,7 @@
 #include "math.h"
 #include <iostream>
 #include <iomanip>
+#include <tuple>
 
 using namespace std;
 Matrix4by4::Matrix4by4()
@@ -68,6 +69,29 @@ void Matrix4by4::loadRotationMatrix(int rotate_axis, int degree)
 		cout << "load rotation matrix error!" << endl;
 		break;
 	}
+	return;
+}
+
+void Matrix4by4::loadGRMatrix( tuple<float, float, float> v1, tuple<float, float, float> v2, tuple<float, float, float> v3)
+{
+	this->matrix[0][0] = get<0>(v1);
+	this->matrix[0][1] = get<1>(v1);
+	this->matrix[0][2] = get<2>(v1);
+
+	this->matrix[1][0] = get<0>(v2);
+	this->matrix[1][1] = get<1>(v2);
+	this->matrix[1][2] = get<2>(v2);
+
+	this->matrix[2][0] = get<0>(v3);
+	this->matrix[2][1] = get<1>(v3);
+	this->matrix[2][2] = get<2>(v3);
+	
+	return;
+}
+
+void Matrix4by4::loadMirrorMatrix()
+{
+	this->matrix[0][0] = -1;
 	return;
 }
 
