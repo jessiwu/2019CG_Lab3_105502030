@@ -95,6 +95,39 @@ void Matrix4by4::loadMirrorMatrix()
 	return;
 }
 
+void Matrix4by4::loadTiltMatrix(float degree)
+{
+	const double PI = 3.14159;
+	float sineOfDegree = round(sin(degree * PI / 180) * 1000) / 1000;
+	float cosineOfDegree = round(cos(degree * PI / 180) * 1000) / 1000;
+
+	this->matrix[0][0] = cosineOfDegree;
+	this->matrix[0][1] = sineOfDegree;
+	this->matrix[1][0] = -sineOfDegree;
+	this->matrix[1][1] = cosineOfDegree;
+	
+	return;
+}
+
+void Matrix4by4::loadPerspectiveProjectionMatrix(float aspectRatio, float H, float y, float theta)
+{
+	const double PI = 3.14159;
+	float tangentOfTheta = round(cos(theta * PI / 180) * 1000) / 1000;
+
+	this->matrix[1][1] = aspectRatio;
+	this->matrix[2][2] = y * tangentOfTheta / (y - H);
+	this->matrix[2][3] = H * y * tangentOfTheta / (y - H);
+	this->matrix[3][2] = tangentOfTheta;
+	this->matrix[3][3] = 0;
+
+	return;
+}
+
+float Matrix4by4::getEntryIJOfMatrix(int i, int j)
+{
+	return this->matrix[i][j];
+}
+
 void Matrix4by4::leftMultiplyBy(Matrix4by4 multiplier)
 {
 	float resultMatrix[4][4] = { {0,0,0,0}, {0,0,0,0}, {0,0,0,0}, {0,0,0,0} };

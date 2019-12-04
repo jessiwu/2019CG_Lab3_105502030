@@ -15,6 +15,9 @@ public:
 	void loadRotationMatrix(int axis, int degree);
 	void loadGRMatrix(tuple<float, float, float> v1, tuple<float, float, float> v2, tuple<float, float, float> v3);
 	void loadMirrorMatrix();
+	void loadTiltMatrix(float degree);
+	void loadPerspectiveProjectionMatrix(float aspectRatio, float H, float y, float theta);
+	float getEntryIJOfMatrix(int i, int j);
 
 	void leftMultiplyBy(Matrix4by4 multiplier);
 	void printMatrix();

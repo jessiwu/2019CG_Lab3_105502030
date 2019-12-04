@@ -27,15 +27,19 @@ void translateCommand(float tx, float ty, float tz);
 void observerCommand(float eyeLocX, float eyeLocY, float eyeLocZ, 
 	float CoIX, float CoIY, float CoIZ, float tilt, 
 	float H, float y, float theta);
-
+void viewportCommand(float vp_xLeft, float vp_xRight, float vp_yBottom, float vp_yTop);
 void objectCommand();
 
 
 int WINDOW_WIDTH;
 int WINDOW_HEIGHT;
+int H_ProjMatrix, y_ProjMatrix, theta_ProjMatrix;
+int viewport_XMin, viewport_XMax, viewport_YMin, viewport_YMax;
 string inputFileName;
 string obj_ascFileName;
 Matrix4by4 TM;
+Matrix4by4 EyeMatrix;
+Matrix4by4 PerspectiveProjMatrix;
 vector<Vertex> vertices_vec;
 vector<Plane> object_vec;
 
@@ -122,7 +126,9 @@ void readInputCommand(string command)
 			
 		}
 		else if (command_type == "viewport") {
-
+			float vp_xLeft, vp_xRight, vp_yBottom, vp_yTop;
+			ss >> vp_xLeft >> vp_xRight >> vp_yBottom >> vp_yTop;
+			viewportCommand(vp_xLeft, vp_xRight, vp_yBottom, vp_yTop);
 		}
 		else if (command_type == "display") {
 			//clear the window
@@ -130,6 +136,7 @@ void readInputCommand(string command)
 			glutPostRedisplay(); //request display() call ASAP
 			
 			//draw on the screen
+			// WARNING: implement displayCommand();
 			system("pause");
 		}
 		else if (command_type == "end") {
@@ -212,7 +219,7 @@ void observerCommand(float eyeLocX, float eyeLocY, float eyeLocZ, float CoIX, fl
 		get<2>(VectorZ)*get<0>(Vector1) - get<0>(VectorZ)*get<2>(Vector1),
 		get<0>(VectorZ)*get<1>(Vector1) - get<1>(VectorZ)*get<0>(Vector1)
 	);
-	Matrix4by4 eyeMatrix;
+	
 
 	Matrix4by4 eyeTranslateMatrix;
 	eyeTranslateMatrix.loadTranslationMatrix(-eyeLocX, -eyeLocY, -eyeLocZ);
@@ -223,14 +230,43 @@ void observerCommand(float eyeLocX, float eyeLocY, float eyeLocZ, float CoIX, fl
 	Matrix4by4 MirrorMatrix;
 	MirrorMatrix.loadMirrorMatrix();
 
-	eyeMatrix.leftMultiplyBy(eyeTranslateMatrix);
-	eyeMatrix.leftMultiplyBy(GRMatrix);
-	eyeMatrix.leftMultiplyBy(MirrorMatrix);
+	Matrix4by4 TiltMatrix;
+	TiltMatrix.loadTiltMatrix(tilt);
 
-	eyeMatrix.printMatrix();
+	EyeMatrix.leftMultiplyBy(eyeTranslateMatrix);
+	EyeMatrix.leftMultiplyBy(GRMatrix);
+	EyeMatrix.leftMultiplyBy(MirrorMatrix);
+	EyeMatrix.leftMultiplyBy(TiltMatrix);
+
+	// wait viewport command
+	EyeMatrix.printMatrix();
+
+	// save the coefficients of Perspective PM in global variables
+	H_ProjMatrix = H;
+	y_ProjMatrix = y;
+	theta_ProjMatrix = theta;
 
 	return;
 
+}
+
+void viewportCommand(float vp_xLeft, float vp_xRight, float vp_yBottom, float vp_yTop)
+{
+	viewport_XMin = WINDOW_WIDTH / 2 + WINDOW_WIDTH / 2 * vp_xLeft;
+	viewport_XMax = WINDOW_WIDTH / 2 + WINDOW_WIDTH / 2 * vp_xRight; 
+	viewport_YMin = WINDOW_HEIGHT / 2 + WINDOW_HEIGHT / 2 * vp_yBottom;
+	viewport_YMax = WINDOW_HEIGHT / 2 + WINDOW_HEIGHT / 2 * vp_yTop;
+	float aspectRatio = (viewport_XMax - viewport_XMin) / (viewport_YMax - viewport_YMin);
+
+	// create Perspective Projection Matrix
+	PerspectiveProjMatrix.loadPerspectiveProjectionMatrix(aspectRatio, 
+		H_ProjMatrix, y_ProjMatrix, theta_ProjMatrix);
+
+	cout << "Perspective Projectio Matrix is: " << endl;
+
+	PerspectiveProjMatrix.printMatrix();
+
+	return;
 }
 
 void objectCommand()
