@@ -112,11 +112,11 @@ void Matrix4by4::loadTiltMatrix(float degree)
 void Matrix4by4::loadPerspectiveProjectionMatrix(float aspectRatio, float H, float y, float theta)
 {
 	const double PI = 3.14159;
-	float tangentOfTheta = round(cos(theta * PI / 180) * 1000) / 1000;
+	float tangentOfTheta = round(tan(theta * PI / 180) * 1000) / 1000;
 
 	this->matrix[1][1] = aspectRatio;
 	this->matrix[2][2] = y * tangentOfTheta / (y - H);
-	this->matrix[2][3] = H * y * tangentOfTheta / (y - H);
+	this->matrix[2][3] = H * y * tangentOfTheta / (H - y);
 	this->matrix[3][2] = tangentOfTheta;
 	this->matrix[3][3] = 0;
 

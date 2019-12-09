@@ -10,6 +10,7 @@ class Plane
 		vector<Vertex> plane_vec;
 	public:
 		vector<Vertex> getVerticesOfPlane();
+		void setVerticesOfPlane(vector<Vertex> plane_vector);
 };
 
 #endif // !PLANE_H

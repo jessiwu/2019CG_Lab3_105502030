@@ -40,9 +40,10 @@ void Vertex::leftMultiplyByOneMatrix4by4(Matrix4by4 multiplier)
 void Vertex::printXYZCoordinates()
 {
 	
-	std::cout << setw(3) << get<0>(this->XYZcoordinates) << setw(3) << endl;
-	std::cout << setw(3) << get<1>(this->XYZcoordinates) << setw(3) << endl;
-	std::cout << setw(3) << get<2>(this->XYZcoordinates) << setw(3) << endl;
+	std::cout << setw(3) << get<0>(this->XYZcoordinates) << setw(3) << " ";
+	std::cout << setw(3) << get<1>(this->XYZcoordinates) << setw(3) << " "; 
+	std::cout << setw(3) << get<2>(this->XYZcoordinates) << setw(3);
+	std::cout << std::endl;
 	
 	return;
 }
