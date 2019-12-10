@@ -2,47 +2,49 @@
 #include <iostream>
 #include <iomanip>
 
-void Vertex::setCoordinates(float x, float y, float z)
+void Vertex::setVertexCoordinates(float x, float y, float z, float w)
 {
-	get<0>(this->XYZcoordinates) = x;
-	get<1>(this->XYZcoordinates) = y;
-	get<2>(this->XYZcoordinates) = z;
+	get<0>(this->VertexCoordinates) = x;
+	get<1>(this->VertexCoordinates) = y;
+	get<2>(this->VertexCoordinates) = z;
+	get<3>(this->VertexCoordinates) = w;
 	return;
 }
 
-tuple<float, float, float> Vertex::getCoordinates()
+tuple<float, float, float, float> Vertex::getVertexCoordinates()
 {
-	return this->XYZcoordinates;
+	return this->VertexCoordinates;
 }
 
 void Vertex::leftMultiplyByOneMatrix4by4(Matrix4by4 multiplier)
 {
 	float resultMatrix[4][1] = { {0}, {0}, {0}, {0} };
-	float xyzCoordinatesMatrix[4][1] = { {get<0>(this->XYZcoordinates)}, 
-										{get<1>(this->XYZcoordinates)}, 
-										{get<2>(this->XYZcoordinates)},
+	float xyzwCoordinatesMatrix[4][1] = { {get<0>(this->VertexCoordinates)}, 
+										{get<1>(this->VertexCoordinates)}, 
+										{get<2>(this->VertexCoordinates)},
 										1 };
 
 	/* A vertex left-multiplied by a 4x4 matrix */
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 1; j++) {
 			for (int k = 0; k < 4; k++) {
-				resultMatrix[i][j] = resultMatrix[i][j] + multiplier.getEntryIJOfMatrix(i, k) * xyzCoordinatesMatrix[k][j];
+				resultMatrix[i][j] = resultMatrix[i][j] + multiplier.getEntryIJOfMatrix(i, k) * xyzwCoordinatesMatrix[k][j];
 			}
 		}
 	}
 
-	this->setCoordinates(resultMatrix[0][0], resultMatrix[1][0], resultMatrix[2][0]);
+	this->setVertexCoordinates(resultMatrix[0][0], resultMatrix[1][0], resultMatrix[2][0], resultMatrix[3][0]);
 
 	return;
 }
 
-void Vertex::printXYZCoordinates()
+void Vertex::printVertexCoordinates()
 {
 	
-	std::cout << setw(3) << get<0>(this->XYZcoordinates) << setw(3) << " ";
-	std::cout << setw(3) << get<1>(this->XYZcoordinates) << setw(3) << " "; 
-	std::cout << setw(3) << get<2>(this->XYZcoordinates) << setw(3);
+	std::cout << setw(3) << get<0>(this->VertexCoordinates) << setw(3) << " ";
+	std::cout << setw(3) << get<1>(this->VertexCoordinates) << setw(3) << " "; 
+	std::cout << setw(3) << get<2>(this->VertexCoordinates) << setw(3) << " ";
+	std::cout << setw(3) << get<3>(this->VertexCoordinates) << setw(3);
 	std::cout << std::endl;
 	
 	return;
