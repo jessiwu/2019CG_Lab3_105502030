@@ -223,19 +223,19 @@ void observerCommand(float eyeLocX, float eyeLocY, float eyeLocZ, float CoIX, fl
 		get<0>(VectorT)*get<1>(VectorZ) - get<1>(VectorT)*get<0>(VectorZ)
 	);
 
-	// Normalize on Vector1 
-	normalize_val = sqrt(get<0>(Vector1)*get<0>(Vector1) + get<1>(Vector1)*get<1>(Vector1) + get<2>(Vector1)*get<2>(Vector1));
-
-	get<0>(Vector1) = get<0>(Vector1) / normalize_val;
-	get<1>(Vector1) = get<1>(Vector1) / normalize_val;
-	get<2>(Vector1) = get<2>(Vector1) / normalize_val;
-
 	// Vector2 = Vector3 (VectorZ) x Vector1
 	tuple<float, float, float> Vector2(
 		get<1>(VectorZ)*get<2>(Vector1) - get<2>(VectorZ)*get<1>(Vector1),
 		get<2>(VectorZ)*get<0>(Vector1) - get<0>(VectorZ)*get<2>(Vector1),
 		get<0>(VectorZ)*get<1>(Vector1) - get<1>(VectorZ)*get<0>(Vector1)
 	);
+
+	// Normalize on Vector1 
+	normalize_val = sqrt(get<0>(Vector1)*get<0>(Vector1) + get<1>(Vector1)*get<1>(Vector1) + get<2>(Vector1)*get<2>(Vector1));
+
+	get<0>(Vector1) = get<0>(Vector1) / normalize_val;
+	get<1>(Vector1) = get<1>(Vector1) / normalize_val;
+	get<2>(Vector1) = get<2>(Vector1) / normalize_val;
 
 	// Normalize on Vector2 
 	normalize_val = sqrt(get<0>(Vector2)*get<0>(Vector2) + get<1>(Vector2)*get<1>(Vector2) + get<2>(Vector2)*get<2>(Vector2));
@@ -320,13 +320,37 @@ void displayCommand()
 
 		for (int j = 0; j < ith_plane_vec.size(); j++) {
 
+			/*cout << "Before" << endl;
+			ith_plane_vec[j].printXYZCoordinates();
+			cout << endl;*/
+
 			//Step 1. do Matrices Multiplication: multiply TM, EM, PM
 			ith_plane_vec[j].leftMultiplyByOneMatrix4by4(TM);
+
+			/*
+			cout << "After TM," << endl;
+			ith_plane_vec[j].printXYZCoordinates();
+			cout << endl;
+			*/
 			ith_plane_vec[j].leftMultiplyByOneMatrix4by4(EyeMatrix);
-			ith_plane_vec[j].leftMultiplyByOneMatrix4by4(PerspectiveProjMatrix);
 			
+			/*
+			cout << "After EM," << endl;
+			ith_plane_vec[j].printXYZCoordinates();
+			cout << endl;
+
+			*/
+			float old_z = get<2>(ith_plane_vec[j].getCoordinates());
+			ith_plane_vec[j].leftMultiplyByOneMatrix4by4(PerspectiveProjMatrix);
+
+			cout << "After PM," << endl;
+			ith_plane_vec[j].printXYZCoordinates();
+			cout << endl;
+
 			//Step 2. do Perspective Divide 
 			perspectiveDivide_val = get<2>(ith_plane_vec[j].getCoordinates())*tangentOfTheta;
+			perspectiveDivide_val = old_z*tangentOfTheta; //edit
+
 			ith_plane_vec[j].setCoordinates(
 				get<0>(ith_plane_vec[j].getCoordinates()) / perspectiveDivide_val, 
 				get<1>(ith_plane_vec[j].getCoordinates()) / perspectiveDivide_val,
@@ -345,6 +369,10 @@ void displayCommand()
 				new_y,
 				get<2>(ith_plane_vec[j].getCoordinates())
 			);
+
+			/*cout << "After WTV," << endl;
+			ith_plane_vec[j].printXYZCoordinates();
+			cout << endl;*/
 
 		}
 
@@ -379,6 +407,8 @@ void displayCommand()
 				);
 			}
 		}
+
+		magicPen.drawLine(400, 400, 500, 500);
 	}
 
 	// Reset the matrices

@@ -23,7 +23,7 @@ void Vertex::leftMultiplyByOneMatrix4by4(Matrix4by4 multiplier)
 										{get<2>(this->XYZcoordinates)},
 										1 };
 
-	/* A vertex lefy-multiplied by a 4x4 matrix */
+	/* A vertex left-multiplied by a 4x4 matrix */
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 1; j++) {
 			for (int k = 0; k < 4; k++) {
