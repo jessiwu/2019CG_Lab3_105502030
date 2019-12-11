@@ -2,6 +2,6 @@
 3D Computer Graphics homework 3
 
 
-# the current version is now implemented without the requirements of 1. clipping 2. nobackfaces 
+the current version is now implemented without the requirements of 1. clipping 2. nobackfaces 
 
-### Plagiarism is NOT allowed!!!
+## N Plagiarism is NOT allowed!!!
