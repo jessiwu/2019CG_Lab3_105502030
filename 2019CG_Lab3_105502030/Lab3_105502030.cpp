@@ -210,6 +210,7 @@ void observerCommand(float eyeLocX, float eyeLocY, float eyeLocZ, float CoIX, fl
 
 	get<0>(VectorZ) = get<0>(VectorZ) / normalize_val;
 	get<1>(VectorZ) = get<1>(VectorZ) / normalize_val;
+
 	get<2>(VectorZ) = get<2>(VectorZ) / normalize_val;
 
 	// assume top point is ( 0, 1, 0 ), therefore, VectorT(top vector) is: Top Point - EyeLocation
@@ -376,6 +377,7 @@ void displayCommand()
 			}
 		}
 		tmp_points_list.clear();
+		glFinish();
 	}
 	//magicPen.drawLine(400, 400, 500, 500);
 	//TM.loadIdentityMatrix();

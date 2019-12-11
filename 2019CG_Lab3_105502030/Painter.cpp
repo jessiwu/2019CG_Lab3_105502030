@@ -111,7 +111,7 @@ void Painter::midPointLineSlopeLessThanOne(float x_start, float y_start, float x
 			drawPixel(x, y);
 		}
 	}
-	glFinish();
+	//glFinish();
 	return;
 }
 
@@ -174,6 +174,6 @@ void Painter::midPointLineSlopeGreaterThanOne(float x_start, float y_start, floa
 			drawPixel(x, y);
 		}
 	}
-	glFinish();
+	//glFinish();
 	return;
 }
