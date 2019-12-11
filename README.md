@@ -4,4 +4,4 @@
 
 the current version is now implemented without the requirements of 1. clipping 2. nobackfaces 
 
-## Note. Plagiarism is NOT allowed!!!
+## Note. Plagiarism is NOT allowed.
