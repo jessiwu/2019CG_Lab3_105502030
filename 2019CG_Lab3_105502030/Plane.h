@@ -9,7 +9,7 @@ class Plane
 	private:
 		vector<Vertex> plane_vec;
 	public:
-		vector<Vertex> getVerticesOfPlane();
+		vector<Vertex> getVertexVectorOfPlane();
 		void setVerticesOfPlane(vector<Vertex> plane_vector);
 };
 
